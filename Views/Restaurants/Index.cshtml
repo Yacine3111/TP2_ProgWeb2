@@ -1,0 +1,89 @@
+﻿@using System.Collections
+@model RestaurantsIndexViewModel
+@{
+	ViewData["Title"] = "Restaurant des Collections!";
+}
+
+@{
+
+	var topCustomers = Model.TopCustomers;
+	if (topCustomers != null)
+	{
+		<h2>Meilleurs clients</h2>
+		<table class="table">
+			<tr>
+				<th>Prénom</th>
+				<th>Nom de famille</th>
+				<th>Nombre de commandes</th>
+			</tr>
+			@foreach (var customer in topCustomers)
+			{
+				<tr>
+					<td>@customer.FirstName</td>
+					<td>@customer.LastName</td>
+					<td>@customer.Orders.Count</td>
+				</tr>
+
+			}
+		</table>
+	}
+
+	var availableTables = Model.AvailableTablesForTimeSlot;
+	if (availableTables != null)
+	{
+		<h2>Tables disponibles</h2>
+		<table class="table">
+			<tr>
+				<th>Numéro</th>
+				<th>Capacité</th>
+			</tr>
+			@foreach (var availableTable in availableTables)
+			{
+				<tr>
+					<td>@availableTable.Number</td>
+					<td>@availableTable.Capacity</td>
+				</tr>
+			}
+		</table>
+	}
+
+	var salesByCategory = Model.SalesByCategory;
+	if (salesByCategory != null)
+	{
+		<h2>Ventes par catégorie</h2>
+		<table class="table">
+			<tr>
+				<th>Catégorie</th>
+				<th>Montant</th>
+			</tr>
+			@foreach (var saleByCategory in salesByCategory)
+			{
+				<tr>
+					<td>Ajoutez la catégorie</td>
+					<td>Ajoutez le montant des ventes de cette catégorie</td>
+				</tr>
+			}
+		</table>
+	}
+
+	var popularMenuItems = Model.PopularMenuItems;
+	if (popularMenuItems != null)
+	{
+		<h2>Items populaires du menu</h2>
+		<table class="table">
+			<tr>
+				<th>Nom</th>
+				<th>Total gagné</th>
+				<th>Total commandé</th>
+			</tr>
+			@foreach (var popularMenuItem in Model.PopularMenuItems)
+			{
+				<tr>
+					<td>@popularMenuItem.Name</td>
+					<td>@popularMenuItem.TotalRevenue</td>
+					<td>@popularMenuItem.TotalOrdered</td>
+				</tr>
+			}
+		</table>
+	}
+}
