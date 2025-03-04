@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 using TP2.Models;
 
 namespace TP2.Data
@@ -101,14 +102,91 @@ namespace TP2.Data
         // Générez les réservations
         public IList<Reservation> SeedReservations(ModelBuilder modelBuilder, IList<Table> tables)
         {
+            IEnumerable<string> enumerableStatus = ["En attente", "Confirmée", "Annulée"];
 
-            return Array.Empty<Reservation>();
+            var reservationFaker = new Faker<Reservation>()
+                .RuleFor(r => r.Id, f => f.IndexFaker + 1)
+                .RuleFor(r => r.CustomerId, f => f.Random.Int(1, 50))
+                .RuleFor(c => c.ReservationTime, f => f.Date.BetweenOffset(DateTimeOffset.Parse("2024-12-1"), DateTimeOffset.Parse("2025-02-1")))
+                .RuleFor(c => c.GuestCount, f => f.Random.Int(1, 10))
+                .RuleFor(c => c.Status, f => f.PickRandom(enumerableStatus))
+                .RuleFor(c => c.TableId, (f, c) =>
+                {
+                    var suitableTables = tables.Where(t => t.Capacity >= c.GuestCount && t.IsAvailable).ToList();
+                    Table? table;
+
+                    if (suitableTables.Count == 0)
+                    {
+                        table = tables.MaxBy(t => t.Capacity);
+                        c.GuestCount = table.Capacity;
+                    }
+                    else
+                    {
+                        table = f.PickRandom(suitableTables);
+
+                    }
+                    return table.Id;
+                });
+
+            var listReservation = reservationFaker.Generate(100);
+
+            modelBuilder.Entity<Reservation>()
+                .HasData(listReservation);
+
+            return listReservation;
         }
 
         // Générez les commandes et les items de commandes
         public IList<Order> SeedOrders(ModelBuilder modelBuilder, IList<MenuItem> menuItems)
         {
-            return Array.Empty<Order>();
+            var orderItemFaker = new Faker<OrderItem>()
+                .RuleFor(oi => oi.Id, f => f.IndexFaker + 1)
+                .RuleFor(oi => oi.MenuItemId, f => f.Random.Int(1, 30))
+                .RuleFor(oi => oi.Quantity, f => f.Random.Int(1, 3))
+                .RuleFor(oi => oi.UnitPrice, (f, oi) =>
+                {
+                    var item = menuItems.FirstOrDefault(m => m.Id == oi.MenuItemId);
+
+                    return item.Price;
+                });
+
+            IEnumerable<string> enumerableStatus = ["En préparation", "Servi", "Payé"];
+            IList<OrderItem> items = new List<OrderItem>();
+
+            var orderFaker = new Faker<Order>()
+                .RuleFor(o => o.Id, f => f.IndexFaker + 1)
+                .RuleFor(o => o.OrderTime, f => f.Date.BetweenOffset(DateTimeOffset.Parse("2024-12-1"), DateTimeOffset.Parse("2025-02-1")))
+                .RuleFor(o => o.Status, f => f.PickRandom(enumerableStatus))
+                .RuleFor(o => o.CustomerId, f => f.Random.Int(1, 50))
+                .RuleFor(o => o.TableId, f => f.Random.Int(1, 20))
+                .RuleFor(o => o.Items, (f, o) =>
+                {
+                    var newItems = orderItemFaker.GenerateBetween(2, 4);
+                    foreach (var item in newItems)
+                    {
+                        item.OrderId = o.Id;
+                    }
+
+                    items.AddRange(newItems);
+
+                    return null;
+
+                })
+                .RuleFor(o => o.TotalAmount, (f, o) =>
+                {
+                    var total = items.Where(x => x.OrderId == o.Id).Sum(i => i.Quantity * i.UnitPrice);
+
+                    return total;
+                });
+            var listOrder = orderFaker.Generate(200);
+
+            modelBuilder.Entity<OrderItem>()
+                .HasData(items);
+
+            modelBuilder.Entity<Order>()
+                .HasData(listOrder);
+
+            return listOrder;
         }
 
     }
