@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TP2.Data;
 
@@ -11,9 +12,11 @@ using TP2.Data;
 namespace TP2.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    partial class RestaurantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304040551_MenuItemMigration")]
+    partial class MenuItemMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -877,168 +880,6 @@ namespace TP2.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tables");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Capacity = 4,
-                            IsAvailable = true,
-                            Location = "Privé",
-                            Number = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Capacity = 6,
-                            IsAvailable = true,
-                            Location = "Privé",
-                            Number = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Capacity = 8,
-                            IsAvailable = true,
-                            Location = "Salle principale",
-                            Number = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Capacity = 2,
-                            IsAvailable = false,
-                            Location = "Salle principale",
-                            Number = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Capacity = 2,
-                            IsAvailable = true,
-                            Location = "Coin fenêtre",
-                            Number = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Capacity = 2,
-                            IsAvailable = false,
-                            Location = "Salle principale",
-                            Number = 6
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Capacity = 8,
-                            IsAvailable = true,
-                            Location = "Terrasse",
-                            Number = 7
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Capacity = 2,
-                            IsAvailable = false,
-                            Location = "Terrasse",
-                            Number = 8
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Capacity = 2,
-                            IsAvailable = true,
-                            Location = "Privé",
-                            Number = 9
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Capacity = 2,
-                            IsAvailable = true,
-                            Location = "Terrasse",
-                            Number = 10
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Capacity = 4,
-                            IsAvailable = true,
-                            Location = "Coin fenêtre",
-                            Number = 11
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Capacity = 2,
-                            IsAvailable = true,
-                            Location = "Salle principale",
-                            Number = 12
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Capacity = 4,
-                            IsAvailable = true,
-                            Location = "Salle principale",
-                            Number = 13
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Capacity = 4,
-                            IsAvailable = true,
-                            Location = "Salle principale",
-                            Number = 14
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Capacity = 4,
-                            IsAvailable = false,
-                            Location = "Terrasse",
-                            Number = 15
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Capacity = 4,
-                            IsAvailable = false,
-                            Location = "Coin fenêtre",
-                            Number = 16
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Capacity = 2,
-                            IsAvailable = true,
-                            Location = "Salle principale",
-                            Number = 17
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Capacity = 4,
-                            IsAvailable = true,
-                            Location = "Privé",
-                            Number = 18
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Capacity = 2,
-                            IsAvailable = false,
-                            Location = "Salle principale",
-                            Number = 19
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Capacity = 8,
-                            IsAvailable = false,
-                            Location = "Salle principale",
-                            Number = 20
-                        });
                 });
 
             modelBuilder.Entity("TP2.Models.Order", b =>

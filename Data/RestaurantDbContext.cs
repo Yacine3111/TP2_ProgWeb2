@@ -7,7 +7,7 @@ namespace TP2.Data
     {
         public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options) : base(options)
         {
-            
+
         }
 
         public DbSet<Customer> Customers { get; set; }
