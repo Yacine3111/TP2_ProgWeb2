@@ -59,8 +59,8 @@
 			@foreach (var saleByCategory in salesByCategory)
 			{
 				<tr>
-					<td>Ajoutez la catégorie</td>
-					<td>Ajoutez le montant des ventes de cette catégorie</td>
+					<td>@saleByCategory.Key</td>
+					<td>@saleByCategory.Value</td>
 				</tr>
 			}
 		</table>

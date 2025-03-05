@@ -21,9 +21,8 @@ namespace TP2.Services
         /// <returns></returns>
         public IEnumerable<Customer> GetTopCustomers()
         {
-            // À compléter;
-            return Array.Empty<Customer>();
-
+            return _context.Customers
+                .OrderByDescending(c => c.Orders.Count).Include(c => c.Orders);
         }
 
         /// <summary>
@@ -36,8 +35,16 @@ namespace TP2.Services
         /// <returns></returns>
         public IEnumerable<Table> GetAvailableTablesForTimeSlot(DateTimeOffset startTime, int guestCount)
         {
-            // À compléter
-            return Array.Empty<Table>();
+            var tables = _context.Reservations
+                .Where(r => r.ReservationTime >= startTime.AddHours(-2) &&
+                    r.ReservationTime <= startTime.AddHours(2))
+                .Select(r => r.Table)
+                .Where(t => t.IsAvailable)
+                .Where(t => t.Capacity >= guestCount)
+                .OrderBy(t => t.Capacity)
+                .Distinct();
+
+            return tables;
         }
 
         /// <summary>
@@ -47,10 +54,23 @@ namespace TP2.Services
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public IEnumerable<object> GetSalesByCategory(DateTimeOffset date)
+        public IDictionary<string, int> GetSalesByCategory(DateTimeOffset date)
         {
-            // À compléter
-            return Array.Empty<object>();
+
+            return _context.OrderItems
+                .Where(o => o.Order.OrderTime.Date == date.Date)
+                .Select(o => new MenuItemWithStats()
+                {
+                    Id = o.MenuItemId,
+                    Name = o.MenuItem.Name,
+                    Category = o.MenuItem.Category,
+                    Price = o.MenuItem.Price,
+                    TotalOrdered = o.Quantity,
+                    TotalRevenue = o.Quantity * o.UnitPrice
+
+                })
+                .GroupBy(o => o.Category)
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.TotalOrdered));
         }
 
         /// <summary>

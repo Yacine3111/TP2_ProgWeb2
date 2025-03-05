@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TP2.Data;
 using TP2.Services;
 using TP2.ViewModels;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TP2.Controllers
 {
