@@ -19,10 +19,12 @@ namespace TP2.Services
         /// Le nombre de clients qu'on souhaite obtenir limité est par le Controller, assurez-vous que cette limite est appliquée dans la BD
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Customer> GetTopCustomers()
+        public IOrderedQueryable<Customer> GetTopCustomers()
         {
             return _context.Customers
-                .OrderByDescending(c => c.Orders.Count).Include(c => c.Orders);
+                    .Include(c => c.Orders)
+                    .OrderByDescending(c => c.Orders.Count)
+                ;
         }
 
         /// <summary>
@@ -35,16 +37,18 @@ namespace TP2.Services
         /// <returns></returns>
         public IEnumerable<Table> GetAvailableTablesForTimeSlot(DateTimeOffset startTime, int guestCount)
         {
-            var tables = _context.Reservations
-                .Where(r => r.ReservationTime >= startTime.AddHours(-2) &&
-                    r.ReservationTime <= startTime.AddHours(2))
+            var rangeBefore = startTime.AddHours(-2);
+            var rangeAfter = startTime.AddHours(2);
+
+            return _context.Reservations
+                .Where(r => r.ReservationTime >= rangeBefore &&
+                            r.ReservationTime <= rangeAfter)
                 .Select(r => r.Table)
                 .Where(t => t.IsAvailable)
                 .Where(t => t.Capacity >= guestCount)
                 .OrderBy(t => t.Capacity)
-                .Distinct();
-
-            return tables;
+                .Distinct()
+                .ToList();
         }
 
         /// <summary>
@@ -70,7 +74,9 @@ namespace TP2.Services
 
                 })
                 .GroupBy(o => o.Category)
-                .ToDictionary(g => g.Key, g => g.Sum(x => x.TotalOrdered));
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.TotalOrdered))
+                ;
+
         }
 
         /// <summary>
@@ -82,9 +88,31 @@ namespace TP2.Services
         /// <param name="referenceDate">La date de référence</param>
         /// <param name="daysBefore">Le nombre de jours précédant la date de référence</param>
         /// <returns></returns>
-        public IEnumerable<MenuItemWithStats> GetPopularMenuItems(DateTimeOffset referenceDate, int daysBefore)
+        public IOrderedEnumerable<MenuItemWithStats> GetPopularMenuItems(DateTimeOffset referenceDate, int daysBefore)
         {
-            return Array.Empty<MenuItemWithStats>();
+            var dateBefore = referenceDate.AddDays(-daysBefore);
+
+
+
+
+            return _context.OrderItems
+                    .Include(o => o.MenuItem)
+                    .Include(o => o.Order)
+                    .AsEnumerable()
+                    .Where(o => o.Order.OrderTime >= dateBefore &&
+                                o.Order.OrderTime <= referenceDate)
+                    .Select(o => o.MenuItem)
+                    .Select(o => new MenuItemWithStats()
+                    {
+                        Id = o.Id,
+                        Category = o.Category,
+                        Name = o.Name,
+                        Price = o.Price,
+                        TotalOrdered = o.OrderItems.Count,
+                        TotalRevenue = o.OrderItems.Sum(oi => oi.Quantity * o.Price)
+                    })
+                    .OrderByDescending(m => m.TotalOrdered)
+                ;
         }
 
     }
